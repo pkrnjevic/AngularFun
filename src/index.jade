@@ -1,0 +1,80 @@
+!!! 5
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+    title Angular Fun
+    meta(name='description', content='AngularJS Reference Architecture')
+    meta(name='viewport', content='width=device-width')
+
+    script(src='scripts/libs/json2.js')
+    //- script(src='/scripts/libs/html5shiv-printshiv.js')
+    link(rel='stylesheet', href='/styles/styles.css')
+
+  body.ng-cloak(ng-cloak='ng-cloak')
+    ng:view
+    .container
+      .hero-unit
+        h1
+          | Playing with
+          a(href='http://angularjs.org', target='_blank')  AngularJS
+        p
+          | and also
+          a(href='http://requirejs.org/', target='_blank')  RequireJS
+        p
+          | Dynamically loading dependencies in
+          b  dev
+          | , but minimize the hell out of it for
+          b  prod
+          | .
+        p RequireJS is only used for dev and build.
+      .row
+        .span8
+          app:tabs
+            app:tab(data-tab-id='gitHub', caption='GitHub')
+              section(ng-controller='gitHubController')
+                .alert.alert-info(ng-show='!searchTerm.length')
+                  h4.alert-heading Heads up!
+                  span Enter GitHub search criteria.
+                form.well.form-search(ng-submit='search(searchTerm)')
+                  input.input-medium.search-query(type='text', ng-model='searchTerm')
+                  button.btn(type='submit')
+                    i.icon-search
+                    | Search
+                div(ng-include='\'/views/repos.html\'')
+            app:tab(data-tab-id='people', caption='People')
+              .row
+                .span6
+                  section(ng-controller='personController')
+                    .alert.alert-error(ng-show='!!error')
+                      h4.alert-heading(ng-bind='error.title')
+                      span(ng-bind='error.message')
+                    form.well.form-search(ng-submit='insertPerson(person)')
+                      p
+                        span.label.label-info Heads up! 
+                        span.text-info  Try adding a duplicate name.
+                      input.input-medium(type='text', ng-model='person.name', placeholder='Name')
+                      input.input-small(type='text', ng-model='person.age', placeholder='Age')
+                      button.btn(type='submit')
+                        i.icon-plus
+                        | Add Person
+                    div(ng-include='\'/views/people.html\'')
+                .span2
+                  section(ng-controller='personDetailsController')
+                    dl
+                      dt Name
+                      dd(ng-bind='person.name')
+                      dt Age
+                      dd(ng-bind='person.age')
+        .span4
+          h2 Search History
+          section(ng-controller='searchHistoryController')
+            form.well.form-search
+              input.input-medium.search-query(type='text', placeholder='Type filter...', ng-model='query')
+              label(ng-bind-template='Displaying:  {{(searchHistory | filter:query).length}}')
+            ol(ng-hide='!searchHistory.length')
+              li(ng-animate=' \'wave\' ', ng-repeat='item in searchHistory | filter:query | orderBy:\'timeStamp\':true')
+                .floatNone
+                  | {{item.source}}/{{item.criteria}}
+    script(data-main='/scripts/main.js', src='/scripts/libs/require.js')
+

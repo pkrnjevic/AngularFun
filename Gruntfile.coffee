@@ -106,7 +106,7 @@ module.exports = (grunt) ->
 				,
 					'./dist/index.html': './.temp/index.min.html'
 				]
-			# Task is run when the watched index.template file is modified.
+			# Task is run when the watched index.jade file is modified.
 			index:
 				files: [
 					cwd: './.temp/'
@@ -245,9 +245,9 @@ module.exports = (grunt) ->
 					optimizeCss: 'standard'
 					out: './.temp/styles/styles.min.css'
 
-		# Compile template files (.template) to HTML (.html).
+		# Compile jade files (.jade) to HTML (.html).
 		#
-		# .template files are essentially html; however, you can take advantage of features provided by grunt such as underscore templating.
+		# .jade files are essentially html; however, you can take advantage of features provided by grunt such as underscore templating.
 		#
 		# The example below demonstrates the use of the environment configuration setting.
 		# In 'prod' the concatenated and minified scripts are used along with a QueryString parameter of the hash of the file contents to address browser caching.
@@ -258,17 +258,38 @@ module.exports = (grunt) ->
 		# <% } else { %>
 		# 	<script data-main="/scripts/main.js" src="/scripts/libs/require.js"></script>
 		# <% } %>
-		template:
+		jade:
 			views:
-				files:
-					'./.temp/views/': './src/views/**/*.template'
+				options:
+					pretty:
+						true
+					data:
+						debug:
+							true
+				files: [
+					cwd: './src/views/'
+					src: '**/*.jade'
+					dest: './.temp/views/'
+					ext: '.html'
+					expand: true
+				]
 			dev:
+				options:
+					pretty:
+						true
+					data:
+						debug:
+							true
 				files:
-					'./.temp/index.html': './src/index.template'
+					'./.temp/index.html': './src/index.jade'
 				environment: 'dev'
+			# prod:
+			# 	files: '<%= template.dev.files %>'
+			# 	environment: 'prod'
 			prod:
-				files: '<%= template.dev.files %>'
-				environment: 'prod'
+				files:
+					'./.temp/index.html': './src/index.jade'
+				environment: 'dev'
 
 		# Runs unit tests using testacular
 		testacular:
@@ -287,9 +308,9 @@ module.exports = (grunt) ->
 		# Sets up file watchers and runs tasks when watched files are changed.
 		watch:
 			index:
-				files: './src/index.template'
+				files: './src/index.jade'
 				tasks: [
-					'template:dev'
+					'jade:dev'
 					'copy:index'
 				]
 			scripts:
@@ -306,9 +327,9 @@ module.exports = (grunt) ->
 					'copy:styles'
 				]
 			views:
-				files: './src/views/**/*.template'
+				files: './src/views/**/*.jade'
 				tasks: [
-					'template:views'
+					'jade:views'
 					'copy:views'
 				]
 
@@ -319,6 +340,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-imagemin'
+	grunt.loadNpmTasks 'grunt-contrib-jade'
 	grunt.loadNpmTasks 'grunt-contrib-less'
 	grunt.loadNpmTasks 'grunt-contrib-livereload'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
@@ -374,9 +396,9 @@ module.exports = (grunt) ->
 		'coffee:scripts'
 		'copy:js'
 		'less'
-		'template:views'
+		'jade:views'
 		'copy:img'
-		'template:dev'
+		'jade:dev'
 		'copy:dev'
 	]
 
@@ -396,11 +418,11 @@ module.exports = (grunt) ->
 		'coffee:scripts'
 		'copy:js'
 		'less'
-		'template:views'
+		'jade:views'
 		'imagemin'
 		'ngTemplateCache'
 		'requirejs'
-		'template:prod'
+		'jade:prod'
 		'minifyHtml'
 		'copy:prod'
 	]
